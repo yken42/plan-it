@@ -1,88 +1,104 @@
 "use client";
-import React, { FormEvent, useState } from "react";
+import React, {
+  FormEvent,
+  useState,
+  FC,
+  ChangeEvent,
+  useEffect,
+  MouseEvent,
+} from "react";
 import { Navbar } from "../Navbar";
 import MaxWidthWrapper from "@/components/MaxWIdthWrapper";
-import AddButton from './AddButton';
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogClose
-} from "@/components/ui/dialog";
-import { Description } from "@radix-ui/react-dialog";
+import AddButton from "./AddButton";
+import "./style.css";
+import { ITask } from "../../interfaces";
+import NewTaskDialog from "./taskDialog";
+import TodoTask from "./TodoTask";
 
-interface Todo {
-  taskName: string;
-  description?: string;
-  priorety?: string;
-}
+const Tasks: FC = () => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [todoList, setTodoList] = useState<ITask[]>([]);
+  const [task, setTask] = useState<string>("");
+  const [taskDescription, setTaskDescription] = useState<string>("");
+  const [taskColor, setTaskColor] = useState<string>("");
 
-const Tasks = () => {
-  const userTasks: Todo = {
-    taskName: "Grocerries",
-    description: "Buy milk",
-  }
+  const handleTaskChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    if (task !== null) {
+      setTask(e.target.value);
+    }
+  };
 
-  const [isDialogOpen, setIsDialogOpen] = useState<Boolean>(false);
-  const [todoList, setTodoList] = useState<Array<Todo>>([]);
-  const [task, setTask] = useState<String>();
+  const handleDescriptionChange = (
+    e: ChangeEvent<HTMLInputElement>
+  ): void => {
+    if (taskDescription !== null) {
+      setTaskDescription(e.target.value);
+    }
+  };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
-    setTodoList(prev => [...prev, {taskName: "Buy Milk (I'm dad)", description: "never return back home"}])
-  }
+    if (task !== "") {
+      setTodoList([
+        ...todoList,
+        { taskName: task, description: taskDescription, color: taskColor },
+      ]);
+      setIsDialogOpen(false);
+    }
+  };
 
-  const handleAddTask = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setTask(e.target.value);
-  }
+  const handleColorClick = (e: MouseEvent<HTMLDivElement>): void => {
+    const color = (e.target as HTMLDivElement).style.backgroundColor;
+    setTaskColor(color);
+    console.log(color);
+  };
+
+  const handleDeleteTask = (taskName: string): void => {
+    setTodoList(todoList.filter((task) => task.taskName !== taskName));
+  };
+
+  useEffect(() => {
+    console.log(todoList);
+    setTask("");
+    setTaskDescription("");
+    setTaskColor("");
+  }, [todoList]);
+
   return (
     <>
       <Navbar />
-      <MaxWidthWrapper className="px-8 mb-12 text-center min-h-screen">
-        <h1 className="text-left ml-40 text-xl font-medium pt-12">My Tasks</h1>
-        <div className="todos-wrapper flex flex-wrap justify-stretch mx-auto mt-12 w-[80%]">
-        {
-          todoList.map((todo: Todo, index: number) => {
-            return(
-              <div className="tasks_form w-[20%] h-full mx-4 ">
-                <div className="bg-[#9BEBEC]/50 h-fit mb-4 py-4 rounded-2xl add_task border text-left px-4 border-zinc-300 transition ease-in-out w-full shadow-md hover:shadow-xl">
-                  <h1 className="font-bold text-lg">#24 groceries</h1>
-                  <h3 className="text-md pt-2">Buy: Milk, Bread, Yogurt, Vegtables, Fruits, Chicken </h3>
-                  <p className="text-right text-zinc-600 text-sm pt-4">12hrs ago</p>
-                </div>
-              </div>
-            )
-          })
-        }
-        <AddButton onClick={() => setIsDialogOpen(true)}/>
+      <MaxWidthWrapper className="px-8 mb-12 text-center min-h-screen pt-12">
+        <div className="tasks-container border border-zinc-300 w-[85%] mx-auto shadow-lg rounded-lg">
+          <h1 className="text-left ml-4 mt-6 text-xl font-medium w-[80%]">
+            My Tasks
+          </h1>
+          <div className="todos-wrapper flex flex-wrap mx-auto mt-12 w-[100%]">
+            {todoList.map((task: ITask, key: number) => {
+              return (
+                <TodoTask
+                  key={key}
+                  task={task}
+                  onDelete={handleDeleteTask}
+                />
+              );
+            })}
+            <AddButton onClick={() => setIsDialogOpen(true)} />
+          </div>
         </div>
-        
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>New Task</DialogTitle>
-              <DialogDescription>
-                <form onSubmit={handleSubmit}>
-                  <h3 className="pt-6 pb-2 font-medium">Task Name</h3>
-                  <input type='text' className="w-full border border-zinc-300 shadow-lg" onChange={handleAddTask}/>
-                  <h3 className="pt-6 pb-2 font-medium">Description</h3>
-                  <textarea className="w-full border border-zinc-300 h-24 shadow-lg" style={{resize: "none"}} />
-                  <DialogClose>
-                    <Button variant='black' className="mt-6">Submit</Button>
-                  </DialogClose>
-                </form>
-              </DialogDescription>
-            </DialogHeader>
-            
-          </DialogContent>
-        </Dialog>
+        <div className="tasks-container border border-zinc-300 w-[85%] mx-auto shadow-lg mt-12 rounded-lg">
+          <h1 className="text-left ml-4 mt-6 text-xl font-medium w-[80%]">
+            Completed
+          </h1>
+          <div className="todos-wrapper flex flex-wrap justify-stretch mx-auto mt-12 w-[100%]"></div>
+        </div>
+        <NewTaskDialog
+          isOpen={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+          onSubmit={handleSubmit}
+          onTaskChange={handleTaskChange}
+          onDescriptionChange={handleDescriptionChange}
+          onColorClick={handleColorClick}
+        />
       </MaxWidthWrapper>
     </>
   );

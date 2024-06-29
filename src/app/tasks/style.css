@@ -1,0 +1,14 @@
+.tasks_form {
+  width: calc(50% - 2rem);
+}
+
+@media only screen and (min-width: 800px) {
+  .tasks_form {
+    width: calc(25% - 2rem);
+  }
+}
+@media only screen and (min-width: 1270px) {
+  .tasks_form {
+    width: calc(20% - 2rem);
+  }
+}
