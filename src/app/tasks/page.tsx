@@ -17,10 +17,11 @@ import TodoTask from "./TodoTask";
 
 const Tasks: FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [todoList, setTodoList] = useState<ITask[]>([]);
+  const [todoList, setTodoList] = useState<ITask[] | null>([]);
   const [task, setTask] = useState<string>("");
   const [taskDescription, setTaskDescription] = useState<string>("");
-  const [taskColor, setTaskColor] = useState<string>("");
+  const [taskColor, setTaskColor] = useState<string | null>(null);
+  const [selectedDiv, setSelectedDiv] = useState<number | null>(null);
 
   const handleTaskChange = (e: ChangeEvent<HTMLInputElement>): void => {
     if (task !== null) {
@@ -47,15 +48,20 @@ const Tasks: FC = () => {
     }
   };
 
-  const handleColorClick = (e: MouseEvent<HTMLDivElement>): void => {
-    const color = (e.target as HTMLDivElement).style.backgroundColor;
+  const handleColorClick = (e: MouseEvent<HTMLDivElement>, index: number): void => {
+    const color = window.getComputedStyle(e.target as HTMLDivElement).backgroundColor;
     setTaskColor(color);
-    console.log(color);
+    setSelectedDiv(index);
   };
 
   const handleDeleteTask = (taskName: string): void => {
     setTodoList(todoList.filter((task) => task.taskName !== taskName));
   };
+
+  const handleEdit = (taskId: number): void => {
+    const tmpList = todoList;
+    const selItem = tmpList.filter((t) => t.id === taskId);
+  }
 
   useEffect(() => {
     console.log(todoList);
@@ -98,6 +104,7 @@ const Tasks: FC = () => {
           onTaskChange={handleTaskChange}
           onDescriptionChange={handleDescriptionChange}
           onColorClick={handleColorClick}
+          selectedDiv={selectedDiv}
         />
       </MaxWidthWrapper>
     </>

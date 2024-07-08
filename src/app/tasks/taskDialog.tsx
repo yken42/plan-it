@@ -18,6 +18,7 @@ const NewTaskDialog: FC<INewTaskDialogProps> = ({
   onTaskChange,
   onDescriptionChange,
   onColorClick,
+  selectedDiv,
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -41,18 +42,21 @@ const NewTaskDialog: FC<INewTaskDialogProps> = ({
               />
               <div className="picker flex">
                 <h3 className="pt-6 font-medium">Pick Color</h3>
-                <div className="w-12 h-12 border border-zinc-300 mt-3 ml-4"></div>
               </div>
 
-              <div
-                className="color_pick w-[50%] flex justify-between mt-2"
-                onClick={onColorClick}
-              >
-                <div className="w-10 h-10 border border-zinc-300 bg-[#9BEBEC]"></div>
-                <div className="w-10 h-10 border border-zinc-300 bg-[#ECB6F6]"></div>
-                <div className="w-10 h-10 border border-zinc-300 bg-[#934BFC]"></div>
-                <div className="w-10 h-10 border border-zinc-300 bg-yellow-300"></div>
-                <div className="w-10 h-10 border border-zinc-300 bg-[deeppink]"></div>
+              <div className="color_pick w-[55%] flex justify-between mt-2">
+                {["#AB9FB9", "#89A3A4", "#FDA581", "#E4C6CE", "#7A6B8C"].map(
+                  (color: string, index: number) => (
+                    <div
+                      key={index}
+                      className={`w-10 h-10 ${
+                        selectedDiv === index ? "border-2 border-black " : null
+                      }`}
+                      style={{ backgroundColor: color }}
+                      onClick={(e) => onColorClick(e, index)}
+                    ></div>
+                  )
+                )}
               </div>
               <DialogClose>
                 <Button variant="black" className="mt-6">

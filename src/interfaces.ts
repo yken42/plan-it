@@ -13,4 +13,5 @@ export interface INewTaskDialogProps {
     onTaskChange: (e: ChangeEvent<HTMLInputElement>) => void;
     onDescriptionChange: (e: ChangeEvent<HTMLTextAreaElement>) => void;
     onColorClick: (e) => void;
+    selectedDiv: number;
   }
